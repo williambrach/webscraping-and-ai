@@ -1,5 +1,9 @@
-# webscraping-and-ai-presentation
+# Web Scraping and AI 
 
+
+## Content
+
+- CODECON 2024 #ZILINA [slides](/slides/CODECON%202024%20AI%20Scraping.pdf), [code](/src/webscrape_examples.ipynb)
 
 ### Installation guide
 

@@ -1,11 +1,11 @@
-# Web Scraping and AI
-
-A collection of modern web scraping techniques and implementations that combine traditional scraping with AI capabilities. The repository showcases different approaches from traditional BeautifulSoup to LLM-powered solutions, with concrete examples, performance metrics, and cost analysis.
-
+# Is the Future of Web Scraping Agentic?
+A comprehensive exploration of modern web scraping techniques that combine traditional approaches with AI-powered agents. This repository demonstrates the evolution from static scraping to intelligent, autonomous web data extraction using LLMs and agent frameworks.
+# Overview
+Traditional web scraping follows a linear pipeline: Discover → Crawl → Scrape → Extract. Agentic scraping introduces intelligent decision-making, adaptive strategies, and autonomous navigation through AI agents that can reason about web content and interactions.
 ## Content
 
-- CODECON 2024 #ZILINA  [Slides](https://github.com/williambrach/webscraping-and-ai/blob/codecon-2024/slides/CODECON%202024%20AI%20Scraping.pdf) / [Code](https://github.com/williambrach/webscraping-and-ai/blob/codecon-2024/src/webscrape_examples.ipynb) / [Video](https://www.youtube.com/watch?v=fhTsBuzMmVI)
 - CODECON 2025 #BRATISLAVA  [Slides](/slides/) / [Code](/src/) / [Video]()
+- CODECON 2024 #ZILINA  [Slides](https://github.com/williambrach/webscraping-and-ai/blob/codecon-2024/slides/CODECON%202024%20AI%20Scraping.pdf) / [Code](https://github.com/williambrach/webscraping-and-ai/blob/codecon-2024/src/webscrape_examples.ipynb) / [Video](https://www.youtube.com/watch?v=fhTsBuzMmVI)
 
 ## Installation Guide
 

@@ -1,0 +1,190 @@
+ SystemMessage 
+You are an AI agent designed to automate browser tasks. Your goal is to accomplish the ultimate task following the rules.
+
+# Input Format
+
+Task
+Previous steps
+Current URL
+Open Tabs
+Interactive Elements
+[index]<type>text</type>
+
+- index: Numeric identifier for interaction
+- type: HTML element type (button, input, etc.)
+- text: Element description
+  Example:
+  [33]<div>User form</div>
+  \t*[35]*<button aria-label='Submit form'>Submit</button>
+
+- Only elements with numeric indexes in [] are interactive
+- (stacked) indentation (with \t) is important and means that the element is a (html) child of the element above (with a lower index)
+- Elements with \* are new elements that were added after the previous step (if url has not changed)
+
+# Response Rules
+
+1. RESPONSE FORMAT: You must ALWAYS respond with valid JSON in this exact format:
+   {"current_state": {"evaluation_previous_goal": "Success|Failed|Unknown - Analyze the current elements and the image to check if the previous goals/actions are successful like intended by the task. Mention if something unexpected happened. Shortly state why/why not",
+   "memory": "Description of what has been done and what you need to remember. Be very specific. Count here ALWAYS how many times you have done something and how many remain. E.g. 0 out of 10 websites analyzed. Continue with abc and xyz",
+   "next_goal": "What needs to be done with the next immediate action"},
+   "action":[{"one_action_name": {// action-specific parameter}}, // ... more actions in sequence]}
+
+2. ACTIONS: You can specify multiple actions in the list to be executed in sequence. But always specify only one action name per item. Use maximum 10 actions per sequence.
+Common action sequences:
+
+- Form filling: [{"input_text": {"index": 1, "text": "username"}}, {"input_text": {"index": 2, "text": "password"}}, {"click_element": {"index": 3}}]
+- Navigation and extraction: [{"go_to_url": {"url": "https://example.com"}}, {"extract_content": {"goal": "extract the names"}}]
+- Actions are executed in the given order
+- If the page changes after an action, the sequence is interrupted and you get the new state.
+- Only provide the action sequence until an action which changes the page state significantly.
+- Try to be efficient, e.g. fill forms at once, or chain actions where nothing changes on the page
+- only use multiple actions if it makes sense.
+
+3. ELEMENT INTERACTION:
+
+- Only use indexes of the interactive elements
+
+4. NAVIGATION & ERROR HANDLING:
+
+- If no suitable elements exist, use other functions to complete the task
+- If stuck, try alternative approaches - like going back to a previous page, new search, new tab etc.
+- Handle popups/cookies by accepting or closing them
+- Use scroll to find elements you are looking for
+- If you want to research something, open a new tab instead of using the current tab
+- If captcha pops up, try to solve it - else try a different approach
+- If the page is not fully loaded, use wait action
+
+5. TASK COMPLETION:
+
+- Use the done action as the last action as soon as the ultimate task is complete
+- Dont use "done" before you are done with everything the user asked you, except you reach the last step of max_steps.
+- If you reach your last step, use the done action even if the task is not fully finished. Provide all the information you have gathered so far. If the ultimate task is completely finished set success to true. If not everything the user asked for is completed set success in done to false!
+- If you have to do something repeatedly for example the task says for "each", or "for all", or "x times", count always inside "memory" how many times you have done it and how many remain. Don't stop until you have completed like the task asked you. Only call done after the last step.
+- Don't hallucinate actions
+- Make sure you include everything you found out for the ultimate task in the done text parameter. Do not just say you are done, but include the requested information of the task.
+
+6. VISUAL CONTEXT:
+
+- When an image is provided, use it to understand the page layout
+- Bounding boxes with labels on their top right corner correspond to element indexes
+
+7. Form filling:
+
+- If you fill an input field and your action sequence is interrupted, most often something changed e.g. suggestions popped up under the field.
+
+8. Long tasks:
+
+- Keep track of the status and subresults in the memory.
+- You are provided with procedural memory summaries that condense previous task history (every N steps). Use these summaries to maintain context about completed actions, current progress, and next steps. The summaries appear in chronological order and contain key information about navigation history, findings, errors encountered, and current state. Refer to these summaries to avoid repeating actions and to ensure consistent progress toward the task goal.
+
+9. Extraction:
+
+- If your task is to find information - call extract_content on the specific pages to get and store the information.
+  Your responses must be always JSON with the specified format.
+
+ HumanMessage 
+Context for the taskDog has 10kg and is 1 year old.
+
+ HumanMessage 
+Your ultimate task is: """What is best food for a Shiba Inu dog?""". If you achieved your ultimate task, stop everything and use the done action in the next step to complete the task. If not, continue as usual.
+
+ HumanMessage 
+Example output:
+
+ AIMessage 
+
+
+ ToolMessage 
+Browser started
+
+ HumanMessage 
+[Your task history memory starts here]
+
+ AIMessage 
+
+
+ ToolMessage 
+
+
+ HumanMessage 
+Action result: 🔗  Navigated to https://www.google.com
+
+ AIMessage 
+
+
+ ToolMessage 
+
+
+ HumanMessage 
+Action result: ⌨️  Input best food for a Shiba Inu dog into index 4
+
+ HumanMessage 
+Action result: Element index changed after action 1 / 2, because page changed.
+
+ HumanMessage 
+[Task history memory ends]
+[Current state starts here]
+The following is one-time information - if you need to remember it write it to memory:
+Current url: https://www.google.com/
+Available tabs:
+[TabInfo(page_id=0, url='https://www.google.com/', title='Google', parent_page_id=None)]
+Interactive elements from top layer of the current page inside the viewport:
+[Start of page]
+[0]<a >Gmail />
+[1]<a aria-label='Search for Images '>Images />
+[2]<a aria-label='Google apps' aria-expanded='false' role='button' />
+[3]<a >Sign in />
+*[4]*<textarea title='Search' value='' aria-label='Search' placeholder='' aria-expanded='true' name='q' role='combobox' />
+[5]<div  />
+	*[6]*<div aria-label='Clear' role='button' />
+[7]<div aria-label='Search by image' role='button' />
+*[8]*<div role='option'>best dog food for a shiba inu />
+*[9]*<div role='option' aria-label='best dog food for shiba inu with allergies'>best dog food for shiba inu
+with
+a
+llergies />
+*[10]*<div role='option' aria-label='what human food can shiba inu eat'>what human
+food
+can
+shiba inu
+eat />
+*[11]*<div role='option' aria-label='what food can shiba inu eat'>what
+food
+can
+shiba inu
+eat />
+*[12]*<div role='option'>best food for shiba inu />
+*[13]*<div role='option' aria-label='best shiba puppy food'>best shiba
+puppy
+food />
+*[14]*<div role='option' aria-label='best food for shiba inu puppy'>best food for shiba inu
+puppy />
+*[15]*<input value='Google Search' aria-label='Google Search' name='btnK' role='button' type='submit' />
+*[16]*<input value='I'm Feeling Lucky' aria-label='I'm Feeling Lucky' name='btnI' type='submit' />
+*[17]*<div role='button'>Report inappropriate predictions />
+Slovakia
+[18]<a >About />
+[19]<a >Advertising />
+[20]<a >Business />
+[21]<a >How Search works />
+[22]<a >Privacy />
+[23]<a >Terms />
+[24]<div aria-expanded='false' role='button'>Settings />
+[End of page]
+Current step: 3/100Current date and time: 2025-05-28 16:14
+
+ RESPONSE
+{
+  "current_state": {
+    "evaluation_previous_goal": "Success - The search query 'best food for a Shiba Inu dog' has been entered into Google. The search results page is loaded with relevant options and suggestions.",
+    "memory": "The search query was successfully input into the search box at index 4. The page has navigated to the search results for this query. Now, I need to review the results and select the most relevant link or snippet to gather information about the best food for a Shiba Inu.",
+    "next_goal": "Review the search results and click on the most relevant link or extract the information directly from the snippets to determine the best food for a Shiba Inu dog."
+  },
+  "action": [
+    {
+      "click_element_by_index": {
+        "index": 8
+      }
+    }
+  ]
+}

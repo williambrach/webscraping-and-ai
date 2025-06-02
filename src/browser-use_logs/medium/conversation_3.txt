@@ -1,0 +1,281 @@
+ SystemMessage 
+You are an AI agent designed to automate browser tasks. Your goal is to accomplish the ultimate task following the rules.
+
+# Input Format
+
+Task
+Previous steps
+Current URL
+Open Tabs
+Interactive Elements
+[index]<type>text</type>
+
+- index: Numeric identifier for interaction
+- type: HTML element type (button, input, etc.)
+- text: Element description
+  Example:
+  [33]<div>User form</div>
+  \t*[35]*<button aria-label='Submit form'>Submit</button>
+
+- Only elements with numeric indexes in [] are interactive
+- (stacked) indentation (with \t) is important and means that the element is a (html) child of the element above (with a lower index)
+- Elements with \* are new elements that were added after the previous step (if url has not changed)
+
+# Response Rules
+
+1. RESPONSE FORMAT: You must ALWAYS respond with valid JSON in this exact format:
+   {"current_state": {"evaluation_previous_goal": "Success|Failed|Unknown - Analyze the current elements and the image to check if the previous goals/actions are successful like intended by the task. Mention if something unexpected happened. Shortly state why/why not",
+   "memory": "Description of what has been done and what you need to remember. Be very specific. Count here ALWAYS how many times you have done something and how many remain. E.g. 0 out of 10 websites analyzed. Continue with abc and xyz",
+   "next_goal": "What needs to be done with the next immediate action"},
+   "action":[{"one_action_name": {// action-specific parameter}}, // ... more actions in sequence]}
+
+2. ACTIONS: You can specify multiple actions in the list to be executed in sequence. But always specify only one action name per item. Use maximum 10 actions per sequence.
+Common action sequences:
+
+- Form filling: [{"input_text": {"index": 1, "text": "username"}}, {"input_text": {"index": 2, "text": "password"}}, {"click_element": {"index": 3}}]
+- Navigation and extraction: [{"go_to_url": {"url": "https://example.com"}}, {"extract_content": {"goal": "extract the names"}}]
+- Actions are executed in the given order
+- If the page changes after an action, the sequence is interrupted and you get the new state.
+- Only provide the action sequence until an action which changes the page state significantly.
+- Try to be efficient, e.g. fill forms at once, or chain actions where nothing changes on the page
+- only use multiple actions if it makes sense.
+
+3. ELEMENT INTERACTION:
+
+- Only use indexes of the interactive elements
+
+4. NAVIGATION & ERROR HANDLING:
+
+- If no suitable elements exist, use other functions to complete the task
+- If stuck, try alternative approaches - like going back to a previous page, new search, new tab etc.
+- Handle popups/cookies by accepting or closing them
+- Use scroll to find elements you are looking for
+- If you want to research something, open a new tab instead of using the current tab
+- If captcha pops up, try to solve it - else try a different approach
+- If the page is not fully loaded, use wait action
+
+5. TASK COMPLETION:
+
+- Use the done action as the last action as soon as the ultimate task is complete
+- Dont use "done" before you are done with everything the user asked you, except you reach the last step of max_steps.
+- If you reach your last step, use the done action even if the task is not fully finished. Provide all the information you have gathered so far. If the ultimate task is completely finished set success to true. If not everything the user asked for is completed set success in done to false!
+- If you have to do something repeatedly for example the task says for "each", or "for all", or "x times", count always inside "memory" how many times you have done it and how many remain. Don't stop until you have completed like the task asked you. Only call done after the last step.
+- Don't hallucinate actions
+- Make sure you include everything you found out for the ultimate task in the done text parameter. Do not just say you are done, but include the requested information of the task.
+
+6. VISUAL CONTEXT:
+
+- When an image is provided, use it to understand the page layout
+- Bounding boxes with labels on their top right corner correspond to element indexes
+
+7. Form filling:
+
+- If you fill an input field and your action sequence is interrupted, most often something changed e.g. suggestions popped up under the field.
+
+8. Long tasks:
+
+- Keep track of the status and subresults in the memory.
+- You are provided with procedural memory summaries that condense previous task history (every N steps). Use these summaries to maintain context about completed actions, current progress, and next steps. The summaries appear in chronological order and contain key information about navigation history, findings, errors encountered, and current state. Refer to these summaries to avoid repeating actions and to ensure consistent progress toward the task goal.
+
+9. Extraction:
+
+- If your task is to find information - call extract_content on the specific pages to get and store the information.
+  Your responses must be always JSON with the specified format.
+
+ HumanMessage 
+Context for the taskWe live in a Slovakia and dog has 10kg and is 1 year old. I am looking for concrete products from local stores.
+
+ HumanMessage 
+Your ultimate task is: """What is best food for a Shiba Inu dog?""". If you achieved your ultimate task, stop everything and use the done action in the next step to complete the task. If not, continue as usual.
+
+ HumanMessage 
+Example output:
+
+ AIMessage 
+
+
+ ToolMessage 
+Browser started
+
+ HumanMessage 
+[Your task history memory starts here]
+
+ AIMessage 
+
+
+ ToolMessage 
+
+
+ HumanMessage 
+Action result: 🔗  Navigated to https://www.google.com/search?q=pet+food+for+shiba+inu+slovakia
+
+ HumanMessage 
+[Task history memory ends]
+[Current state starts here]
+The following is one-time information - if you need to remember it write it to memory:
+Current url: https://www.google.com/search?q=pet+food+for+shiba+inu+slovakia
+Available tabs:
+[TabInfo(page_id=0, url='https://www.google.com/search?q=pet+food+for+shiba+inu+slovakia', title='pet food for shiba inu slovakia - Google Search', parent_page_id=None)]
+Interactive elements from top layer of the current page inside the viewport:
+[Start of page]
+[0]<a title='Go to Google Home' />
+[1]<textarea value='pet food for shiba inu slovakia' aria-label='Search' placeholder='' aria-expanded='false' name='q' role='combobox'>pet food for shiba inu slovakia />
+[2]<div  />
+	[3]<div aria-label='Clear' role='button' />
+[4]<div aria-label='Search by image' role='button' />
+[5]<button aria-label='Search' type='submit' />
+	[6]<div  />
+[7]<div aria-label='Settings' role='button' />
+	[8]<div >Quick Settings />
+[9]<a aria-label='Google apps' aria-expanded='false' role='button' />
+[10]<a >Sign in />
+[11]<a role='link'>All />
+[12]<a role='link'>Images />
+[13]<a role='link'>Products />
+[14]<a role='link'>Product sites />
+[15]<a role='link'>Short videos />
+[16]<a role='link'>Forums />
+[17]<a role='link'>Videos />
+[18]<div aria-expanded='false' role='button' />
+	[19]<div >More />
+[20]<div aria-expanded='false' role='button'>Tools />
+[21]<a >Shiba Inu - kompletný prehľad o plemene />
+	[22]<div  />
+		[23]<div  />
+			[24]<span  />
+				[25]<div  />
+			[26]<div  />
+				[27]<div >Panakei.sk />
+				[28]<div  />
+					[29]<cite role='text'>https://www.panakei.sk
+› shiba-inu-... />
+·
+[30]<a >Translate this page />
+[31]<div aria-label='About this result' role='button' />
+	[32]<span  />
+29 Jun 2023
+—
+Arava Pet Spa
+· Bafpet · Bohemia Pet Food · cdVet · COLLAR · Contipro · DUVO+ · EXPLORER DOG · Fish4Dogs · flexi GmbH & Co. KG · FURminator Pet ...
+5,0
+(2 000)
+[33]<span role='button' aria-label='More information about the review ratings.' />
+People also ask
+[34]<div aria-label='About this result' role='button' />
+	[35]<span  />
+[36]<div aria-expanded='false' role='button'>What is the best dog food for a Shiba Inu? />
+[37]<div aria-expanded='false' role='button'>What not to feed a Shiba Inu? />
+[38]<div aria-expanded='false' role='button'>What do Japanese feed their Shiba Inu? />
+[39]<div aria-expanded='false' role='button'>Is Royal Canin good for Shiba Inu? />
+[40]<div role='button' />
+	[41]<div >Feedback />
+[42]<a >Hello again, What is the best food for Shiba Inu? />
+	[43]<div  />
+		[44]<div  />
+			[45]<span  />
+				[46]<div  />
+			[47]<div  />
+				[48]<div >Reddit · r/shiba />
+				[49]<div >40+ comments  ·  1 year ago />
+[50]<div aria-label='About this result' role='button' />
+	[51]<span  />
+I prefer
+Open Farm kibbles
+, my shiba loves their venison flavour. I also buy freeze dried raw as treats and boil chicken, salmon, squash for her.
+[52]<a >46 answers />
+·
+Top answer:
+Anything you can get them to eat 😂
+[53]<a  />
+	[54]<span >Shiba Puppy Food
+Recommendations - Reddit />
+62 answers
+7 Aug 2024
+[55]<a  />
+	[56]<span >What do you
+feed
+your
+shiba
+? - Reddit />
+111 answers
+20 Dec 2023
+[57]<a >More results from www.reddit.com />
+Missing:
+slovakia
+‎| Show results with:
+[58]<a >slovakia />
+[59]<a >Ideal Diet for Shiba Inus - The Ultimate Shiba Inu Feeding ... />
+	[60]<div  />
+		[61]<div  />
+			[62]<span  />
+				[63]<div  />
+			[64]<div  />
+				[65]<div >iHeartDogs.com />
+				[66]<div  />
+					[67]<cite role='text'>https://iheartdogs.com
+› Dog Facts />
+[68]<div aria-label='About this result' role='button' />
+	[69]<span  />
+29 Nov 2023
+—
+Protein is a vital component of a Shiba Inu's diet.
+High-quality sources such as chicken, beef, lamb, or fish
+should be at the top of the ...
+[70]<a >Shiba inu dry food recommendations? />
+	[71]<div  />
+		[72]<div  />
+			[73]<span  />
+				[74]<div  />
+			[75]<div  />
+				[76]<div >Facebook · Shiba Inu😍 />
+				[77]<div >100+ comments  ·  5 months ago />
+[78]<div aria-label='About this result' role='button' />
+	[79]<span  />
+Sponsored
+[80]<div title='Why this ad?' aria-label='Why this ad?' role='button' />
+[81]<a  />
+	[82]<div  />
+		[83]<div  />
+[84]<a >Hill's Science Plan Canine Adult Medium No Grain Chicken 14kg />
+	[85]<span >Hill's Science Plan Canine Adult Medium No Grain Chicken 14kg />
+[86]<a >By Shopping in EU />
+[87]<a  />
+	[88]<div  />
+		[89]<div  />
+[90]<a >Briantos granuly, 14 kg - 10 % zľava.- Junior kuracie so zemiakmi (12 kg) />
+	[91]<span >Briantos granuly, 14 kg - 10 % zľava.- Junior kuracie so zemiakmi (12 kg) />
+[92]<a >By Google />
+Sale
+[93]<a  />
+	[94]<div  />
+		[95]<div  />
+[96]<a >14kg Briantos Adult losos s ryžou />
+	[97]<span >14kg Briantos Adult losos s ryžou />
+[98]<a >By Google />
+[99]<a  />
+	[100]<div  />
+		[101]<div  />
+[102]<a >Briantos, 14kg za skvělou cenu />
+	[103]<span >Briantos, 14kg za skvělou cenu />
+[104]<a >By Google />
+Sale
+[105]<a  />
+	[106]<div  />
+		[107]<div  />
+[108]<a >12kg Briantos Adult losos so zemiakmi - bez obilnín />
+	[109]<span >12kg Briantos Adult losos so zemiakmi - bez obilnín />
+[110]<a >By Google />
+... 1504 pixels below - scroll or extract content to see more ...
+Current step: 2/30Current date and time: 2025-05-28 16:15
+
+ RESPONSE
+{
+  "current_state": {
+    "evaluation_previous_goal": "Executing action",
+    "memory": "Using tool call",
+    "next_goal": "Execute AgentOutput"
+  },
+  "action": [
+    {}
+  ]
+}

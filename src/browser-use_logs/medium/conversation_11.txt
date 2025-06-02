@@ -1,0 +1,292 @@
+ SystemMessage 
+You are an AI agent designed to automate browser tasks. Your goal is to accomplish the ultimate task following the rules.
+
+# Input Format
+
+Task
+Previous steps
+Current URL
+Open Tabs
+Interactive Elements
+[index]<type>text</type>
+
+- index: Numeric identifier for interaction
+- type: HTML element type (button, input, etc.)
+- text: Element description
+  Example:
+  [33]<div>User form</div>
+  \t*[35]*<button aria-label='Submit form'>Submit</button>
+
+- Only elements with numeric indexes in [] are interactive
+- (stacked) indentation (with \t) is important and means that the element is a (html) child of the element above (with a lower index)
+- Elements with \* are new elements that were added after the previous step (if url has not changed)
+
+# Response Rules
+
+1. RESPONSE FORMAT: You must ALWAYS respond with valid JSON in this exact format:
+   {"current_state": {"evaluation_previous_goal": "Success|Failed|Unknown - Analyze the current elements and the image to check if the previous goals/actions are successful like intended by the task. Mention if something unexpected happened. Shortly state why/why not",
+   "memory": "Description of what has been done and what you need to remember. Be very specific. Count here ALWAYS how many times you have done something and how many remain. E.g. 0 out of 10 websites analyzed. Continue with abc and xyz",
+   "next_goal": "What needs to be done with the next immediate action"},
+   "action":[{"one_action_name": {// action-specific parameter}}, // ... more actions in sequence]}
+
+2. ACTIONS: You can specify multiple actions in the list to be executed in sequence. But always specify only one action name per item. Use maximum 10 actions per sequence.
+Common action sequences:
+
+- Form filling: [{"input_text": {"index": 1, "text": "username"}}, {"input_text": {"index": 2, "text": "password"}}, {"click_element": {"index": 3}}]
+- Navigation and extraction: [{"go_to_url": {"url": "https://example.com"}}, {"extract_content": {"goal": "extract the names"}}]
+- Actions are executed in the given order
+- If the page changes after an action, the sequence is interrupted and you get the new state.
+- Only provide the action sequence until an action which changes the page state significantly.
+- Try to be efficient, e.g. fill forms at once, or chain actions where nothing changes on the page
+- only use multiple actions if it makes sense.
+
+3. ELEMENT INTERACTION:
+
+- Only use indexes of the interactive elements
+
+4. NAVIGATION & ERROR HANDLING:
+
+- If no suitable elements exist, use other functions to complete the task
+- If stuck, try alternative approaches - like going back to a previous page, new search, new tab etc.
+- Handle popups/cookies by accepting or closing them
+- Use scroll to find elements you are looking for
+- If you want to research something, open a new tab instead of using the current tab
+- If captcha pops up, try to solve it - else try a different approach
+- If the page is not fully loaded, use wait action
+
+5. TASK COMPLETION:
+
+- Use the done action as the last action as soon as the ultimate task is complete
+- Dont use "done" before you are done with everything the user asked you, except you reach the last step of max_steps.
+- If you reach your last step, use the done action even if the task is not fully finished. Provide all the information you have gathered so far. If the ultimate task is completely finished set success to true. If not everything the user asked for is completed set success in done to false!
+- If you have to do something repeatedly for example the task says for "each", or "for all", or "x times", count always inside "memory" how many times you have done it and how many remain. Don't stop until you have completed like the task asked you. Only call done after the last step.
+- Don't hallucinate actions
+- Make sure you include everything you found out for the ultimate task in the done text parameter. Do not just say you are done, but include the requested information of the task.
+
+6. VISUAL CONTEXT:
+
+- When an image is provided, use it to understand the page layout
+- Bounding boxes with labels on their top right corner correspond to element indexes
+
+7. Form filling:
+
+- If you fill an input field and your action sequence is interrupted, most often something changed e.g. suggestions popped up under the field.
+
+8. Long tasks:
+
+- Keep track of the status and subresults in the memory.
+- You are provided with procedural memory summaries that condense previous task history (every N steps). Use these summaries to maintain context about completed actions, current progress, and next steps. The summaries appear in chronological order and contain key information about navigation history, findings, errors encountered, and current state. Refer to these summaries to avoid repeating actions and to ensure consistent progress toward the task goal.
+
+9. Extraction:
+
+- If your task is to find information - call extract_content on the specific pages to get and store the information.
+  Your responses must be always JSON with the specified format.
+
+ HumanMessage 
+Context for the taskWe live in a Slovakia and dog has 10kg and is 1 year old. I am looking for concrete products from local stores.
+
+ HumanMessage 
+Your ultimate task is: """What is best food for a Shiba Inu dog?""". If you achieved your ultimate task, stop everything and use the done action in the next step to complete the task. If not, continue as usual.
+
+ HumanMessage 
+Example output:
+
+ AIMessage 
+
+
+ ToolMessage 
+Browser started
+
+ HumanMessage 
+## Summary of the agent's execution history
+
+**Task Objective**: The task involves searching for pet food options suitable for Shiba Inu in Slovakia, exploring search results, and interacting with the webpage to gather information.
+
+**Progress Status**: 100% complete — all search and navigation steps have been performed, including multiple searches, clicks, and scrolling actions.
+
+1. **Agent Action**: Navigated to the URL "https://www.google.com/search?q=pet+food+for+shiba+inu+slovakia"  
+   **Action Result**:  
+   "🔗  Navigated to https://www.google.com/search?q=pet+food+for+shiba+inu+slovakia"  
+   **Key Findings**: Search results page for pet food for Shiba Inu in Slovakia loaded successfully.  
+   **Navigation History**: Google search results page for "pet food for shiba inu slovakia" loaded.  
+   **Current Context**: Ready to interact with search results.
+
+2. **Agent Action**: Clicked button with index 52, which resulted in "46 answers"  
+   **Action Result**:  
+   "🖱️  Clicked button with index 52: 46 answers"  
+   **Key Findings**: The button at index 52 was clicked, revealing 46 answers.  
+   **Current Context**: The answers are displayed; further interaction may be needed.
+
+3. **Agent Action**: Navigated to the URL "https://www.google.com/search?q=best+dog+food+for+shiba+inu+slovakia"  
+   **Action Result**:  
+   "🔗  Navigated to https://www.google.com/search?q=best+dog+food+for+shiba+inu+slovakia"  
+   **Key Findings**: Search results page for the best dog food for Shiba Inu in Slovakia loaded successfully.  
+   **Navigation History**: Google search results page for "best dog food for shiba inu slovakia" loaded.  
+   **Current Context**: Ready to explore search results further.
+
+4. **Agent Action**: Scrolled down the page by 300 pixels  
+   **Action Result**:  
+   "🔍 Scrolled down the page by 300 pixels"  
+   **Key Findings**: Page scrolled to reveal additional search results.  
+   **Current Context**: Positioned further down the page, prepared for further interaction.
+
+5. **Agent Action**: Clicked button with index 124  
+   **Action Result**:  
+   "🖱️  Clicked button with index 124:"  
+   **Key Findings**: Button at index 124 was clicked; no additional details provided.  
+   **Current Context**: Interaction with the page continues; next steps may involve further scrolling or clicking.
+
+6. **Agent Action**: Clicked button with index 8  
+   **Action Result**:  
+   "🖱️  Clicked button with index 8:"  
+   **Key Findings**: Button at index 8 was clicked; no further details provided.  
+   **Current Context**: Further interactions may follow; page state updated accordingly.
+
+7. **Agent Action**: Scrolled down the page by 300 pixels  
+   **Action Result**:  
+   "🔍 Scrolled down the page by 300 pixels"  
+   **Key Findings**: Additional scrolling performed to load more content or reveal more results.  
+   **Current Context**: Positioned further down the page, ready for subsequent actions or data extraction.
+
+ HumanMessage 
+Action result: 🖱️  Clicked button with index 43:
+
+ HumanMessage 
+[Task history memory ends]
+[Current state starts here]
+The following is one-time information - if you need to remember it write it to memory:
+Current url: https://www.facebook.com/photo.php?fbid=10234803240641601&set=p.10234803240641601&type=3
+Available tabs:
+[TabInfo(page_id=0, url='https://www.facebook.com/photo.php?fbid=10234803240641601&set=p.10234803240641601&type=3', title='Facebook', parent_page_id=None)]
+Interactive elements from top layer of the current page inside the viewport:
+[Start of page]
+[0]<div >Shiba inu dry food recommendations?
+Summarised by AI from the post below
+Shiba Inu😍
+·
+Join
+Brooklyn Miller
+·
+5 December 2024
+·
+HELP! new shiba mom! What dog food is your shiba on? Preferably dry, we have him on Iams (healthy digestion) right now.
+HELP! new shiba mom! What dog food is your shiba on? Preferably dry, we have him on Iams (healthy digestion) right now.
+All reactions:
+15
+106
+Like
+Comment
+Share
+Most relevant
+Elena Babysheva
+My boy on raw food since 6 months old and it changed everything. He had so many issues when he was on kibble. He 2.5 years old now and he is healthy and happy. I stay away from any kind kibble especially the prescription one.
+I’m a first time dog owne
+…
+See more
+24w
+2
+View all 10 replies
+Gaige Rigoni
+We feed our boys "Diamond Naturals"  Lamb & Rice. At the pet store it's usually $1/LB. Amazon seems a bit steep but if you have no other access to it I'd say $60 is fair then for a safe and stomach-easy dog food.
+24w
+View all 3 replies
+Courtney Maras
+Hills Science diet lamb recipe
+24w
+2
+View all 2 replies
+Other posts
+Shiba Inu😍
+·
+Join
+Lily Christian
+·
+3d
+·
+Wishing you a happy Memorial Day weekend
+All reactions:
+71
+3
+Like
+Comment
+Share
+All comments
+Brandy Crawford
+I’m so excited when I opened my wallet and I saw my payment of my profit deposited to my wallet. what a boost! You are the type of manager I have always wanted.Thanks so much for the payment Ryan Chandler FX
+3d
+Prince Kian L. Alzona
+Mrs. Sandra Allison is a standout asset trader with exceptional expertise in digital currency. I've witnessed her remarkable skills firsthand. If you're looking for expert guidance, connect with her on Facebook
+Sandra Allison Esme
+2d
+Chris Bidwell
+Seeking a supportive community to reach financial independence and early retirement?
+Path to Early Retirement (The FIRE Tribe)
+offers the guidance you need. Stay updated on industry trends and news with financial advisors and experienced realtors. Share
+…
+See more
+8h
+Shiba Inu😍
+·
+Join
+Lina Polizzotto
+·
+5d
+·
+All reactions:
+6
+2
+Like
+Comment
+Share
+All comments
+Bernadette Parra Cassin
+Un amour
+2d
+Chris Bidwell
+Seeking a supportive community to reach financial independence and early retirement?
+Path to Early Retirement (The FIRE Tribe)
+offers the guidance you need. Stay updated on industry trends and news with financial advisors and experienced realtors. Shar
+…
+See more
+8h
+Gaige Rigoni
+·
+We feed our boys "Diamond Naturals"  Lamb & Rice. At the pet store it's usually $1/LB. Amazon seems a bit steep but if you have no other access to it I'd say $60 is fair then for a safe and stomach-easy dog food. />
+	[1]<div aria-label='Close' role='button' />
+	[2]<div aria-label='Next photo' role='button' />
+		[3]<div  />
+			[4]<div  />
+				[5]<div  />
+	[6]<div aria-label='Zoom In' role='button' />
+	[7]<div aria-label='Zoom Out' role='button' />
+	[8]<div aria-label='Enter full-screen' role='button' />
+	[9]<a aria-label='Gaige Rigoni' role='link' />
+		[10]<div  />
+	[11]<a role='link'>5 December 2024 />
+	[12]<div aria-expanded='false' aria-label='Actions for this post' role='button' />
+	[13]<div role='button' />
+		[14]<div  />
+			[15]<div  />
+			[16]<div >Like />
+	[17]<div role='button' />
+		[18]<div  />
+			[19]<div  />
+			[20]<div >Comment />
+[End of page]
+Current step: 10/30Current date and time: 2025-05-28 16:16
+
+ RESPONSE
+{
+  "current_state": {
+    "evaluation_previous_goal": "Success - The page content shows a Facebook post about dog food recommendations for a Shiba Inu, including various user comments and product details. The post is relevant to the task of finding suitable dog food options.",
+    "memory": "The Facebook post contains user comments about different dog food brands like Diamond Naturals, Hill's Science Diet, and homemade/raw food. The post also includes images and reactions. The current focus is on the post content and comments, with no further actions needed at this moment.",
+    "next_goal": "No immediate next step required. The current page provides relevant information about dog food recommendations for a Shiba Inu. If further details or specific product links are needed, I will extract or interact accordingly."
+  },
+  "action": [
+    {
+      "extract_content": {
+        "goal": "Extract all comments and recommendations about dog food brands for Shiba Inu from the Facebook post."
+      }
+    }
+  ]
+}

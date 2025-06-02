@@ -1,3 +1,25 @@
+[project]
+name = "webscraping-and-ai"
+version = "0.0.2"
+description = "How to scrape web with AI & Agents"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "beautifulsoup4>=4.13.4",
+    "black>=25.1.0",
+    "browser-use[memory]>=0.2.4",
+    "dspy==2.6.23",
+    "httpx>=0.28.1",
+    "ipykernel>=6.29.5",
+    "ipywidgets>=8.1.7",
+    "langchain-litellm>=0.2.1",
+    "pillow>=11.2.1",
+    "playwright>=1.52.0",
+    "python-dotenv>=1.1.0",
+    "ruff>=0.11.11",
+]
+
+
 [tool.ruff]
 #https://beta.ruff.rs/docs/rules/
 lint.select = [
@@ -55,11 +77,11 @@ lint.exclude = [
     "models.py"
 ]
 
-# Same as Black.
-line-length = 88
-
 # Allow unused variables when underscore-prefixed.
 lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+# Same as Black.
+line-length = 88
 
 # Assume Python 3.10.
 target-version = "py39"

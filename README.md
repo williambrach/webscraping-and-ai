@@ -5,32 +5,28 @@ A collection of modern web scraping techniques and implementations that combine 
 ## Content
 
 - CODECON 2024 #ZILINA  [Slides](/slides/CODECON%202024%20AI%20Scraping.pdf) / [Code](/src/webscrape_examples.ipynb) / [Video](https://www.youtube.com/watch?v=fhTsBuzMmVI)
+- CODECON 2025 #BRATISLAVA  [Slides](/slides/) / [Code](/src/) / [Video]()
 
 ## Installation Guide
 
 1. Create environment:
 ```bash
-conda create -n webscrape python=3.12
+uv venv --python 3.12
 ```
 
 2. Activate environment:
 ```bash
-conda activate webscrape
+source .venv/bin/activate
 ```
 
-3. Install uv:
+3. Install dependencies:
 ```bash
-pip install uv
+uv sync
 ```
 
-4. Install dependencies:
+4. Install Playwright:
 ```bash
-uv pip install -r requirements.txt
-```
-
-5. Install Playwright:
-```bash
-playwright install
+uv run playwright install chromium
 ```
 
 ## Environment Setup
@@ -39,6 +35,6 @@ Create a `.env` file with:
 ```plaintext
 LITELLM_API_KEY=
 LITELLM_URL=
+FIRECRAWL_API_KEY=
 ```
 
----

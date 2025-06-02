@@ -4,7 +4,7 @@ A collection of modern web scraping techniques and implementations that combine 
 
 ## Content
 
-- CODECON 2024 #ZILINA  [Slides](/slides/CODECON%202024%20AI%20Scraping.pdf) / [Code](/src/webscrape_examples.ipynb) / [Video](https://www.youtube.com/watch?v=fhTsBuzMmVI)
+- CODECON 2024 #ZILINA  [Slides](https://github.com/williambrach/webscraping-and-ai/blob/codecon-2024/slides/CODECON%202024%20AI%20Scraping.pdf) / [Code](https://github.com/williambrach/webscraping-and-ai/blob/codecon-2024/src/webscrape_examples.ipynb) / [Video](https://www.youtube.com/watch?v=fhTsBuzMmVI)
 - CODECON 2025 #BRATISLAVA  [Slides](/slides/) / [Code](/src/) / [Video]()
 
 ## Installation Guide

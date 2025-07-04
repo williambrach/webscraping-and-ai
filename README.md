@@ -4,7 +4,7 @@ A comprehensive exploration of modern web scraping techniques that combine tradi
 Traditional web scraping follows a linear pipeline: Discover → Crawl → Scrape → Extract. Agentic scraping introduces intelligent decision-making, adaptive strategies, and autonomous navigation through AI agents that can reason about web content and interactions.
 ## Content
 
-- CODECON 2025 #BRATISLAVA  [Slides](/slides/) / [Code](/src/) / [Video]()
+- CODECON 2025 #BRATISLAVA  [Slides](/slides/CODECON%202025%20Web%20Scraping%20Agents.pdf) / [Code](/src/) / [Video](https://www.youtube.com/watch?v=l3dj5huaJwM)
 - CODECON 2024 #ZILINA  [Slides](https://github.com/williambrach/webscraping-and-ai/blob/codecon-2024/slides/CODECON%202024%20AI%20Scraping.pdf) / [Code](https://github.com/williambrach/webscraping-and-ai/blob/codecon-2024/src/webscrape_examples.ipynb) / [Video](https://www.youtube.com/watch?v=fhTsBuzMmVI)
 
 ## Installation Guide
